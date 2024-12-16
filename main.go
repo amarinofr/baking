@@ -10,6 +10,7 @@ import (
 	"github.com/amarinofr/baking-app/handlers"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
@@ -39,6 +40,11 @@ func main() {
 	handlers.InitMixCollection(mixCollection)
 
 	app := fiber.New()
+
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:5173",
+		AllowHeaders: "Origin, Content-Type, Accept",
+	}))
 
 	app.Get("/api/ingredients", handlers.GetIngredients)
 	app.Post("/api/ingredients", handlers.CreateIngredient)

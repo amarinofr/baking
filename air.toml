@@ -1,0 +1,9 @@
+root = "."
+temp_dir = "tmp"
+
+[build]
+  bin = "baking-app"
+  cmd = "go build -o {{.Output}} {{.Input}}"
+  exclude = ["tmp/*", "client/*"]
+  include = ["**/*.go"]
+  ignore = ["tmp/*"]

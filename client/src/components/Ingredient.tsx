@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
 export interface Ingredient {
@@ -18,11 +18,12 @@ export interface Ingredient {
 }
 
 function Ingredient({ ingredient }: { ingredient: Ingredient }) {
-    // const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
-    const { data: ingredients, isLoading } = useQuery<Ingredient[]>({
+    const { data: ingredients } = useQuery<Ingredient[]>({
         queryKey: ['ingredients'],
         queryFn: async () => {
+            setIsLoading(true)
             try {
                 const res = await fetch('http://localhost:3000/api/ingredients')
                 const data = await res.json()
@@ -34,30 +35,29 @@ function Ingredient({ ingredient }: { ingredient: Ingredient }) {
                 return data || []
             } catch (error) {
                 console.error(error)
+            } finally {
+                setIsLoading(false)
             }
         },
     })
 
     console.log(ingredients)
-
     return (
         <>
             <div>
-                {ingredients?.map((ingredient) => (
-                    <div key={ingredient._id}>
-                        <p>{ingredient.name}</p>
-                        <p>
-                            {ingredient.quantity} {ingredient.unit}
-                        </p>
-                        <p>{ingredient.nutrition.calories} calories</p>
-                        <p>{ingredient.nutrition.protein} protein</p>
-                        <p>{ingredient.nutrition.fat} fat</p>
-                        <p>{ingredient.nutrition.carbs.netCarbs} net carbs</p>
-                        <p>
-                            {ingredient.nutrition.carbs.totalCarbs} total carbs
-                        </p>
-                    </div>
-                ))}
+                <form
+                    action="createIngredient"
+                    className="[&_input]:border-2 [&_input]:border-gray-300 [&_input]:rounded-md [&_input]:p-2 [&_button]:bg-blue-500 [&_button]:text-white [&_button]:rounded-md [&_button]:p-2 [&_button]:hover:bg-blue-600"
+                >
+                    <input type="text" name="name" placeholder="Name" />
+                    <input
+                        type="number"
+                        name="quantity"
+                        placeholder="Quantity"
+                    />
+                    <input type="text" name="unit" placeholder="Unit" />
+                    <button type="submit">Create</button>
+                </form>
             </div>
         </>
     )

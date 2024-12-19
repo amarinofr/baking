@@ -33,6 +33,12 @@ func CreateMix(c *fiber.Ctx) error {
 		})
 	}
 
+	if mix.Version == 0 {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"error": "Version is required",
+		})
+	}
+
 	if mix.MixType == "" {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
 			"error": "Mix type is required",

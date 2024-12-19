@@ -4,7 +4,6 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Ingredient struct {
 	ID       primitive.ObjectID  `json:"_id,omitempty" bson:"_id,omitempty"`
-	Completed bool  `json:"completed"`
 	Name     string  `json:"name"`
 	Unit     string  `json:"unit"`
 	Quantity int     `json:"quantity"`

@@ -33,6 +33,12 @@ func CreateRecipe(c *fiber.Ctx) error {
 		})
 	}
 
+	if recipe.Version == 0 {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"error": "Version is required",
+		})
+	}
+
 	if recipe.Type == "" {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
 			"error": "recipe type is required",

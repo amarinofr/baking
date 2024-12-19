@@ -11,7 +11,7 @@ const (
 
 type Recipe struct {
 	ID          primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-	Completed   bool               `json:"completed"`
+	Version     int                `json:"version" bson:"version"`
 	Name        string             `json:"name"`
 	Type        string             `json:"type"`
 	Hydration   float64            `json:"hydration"`

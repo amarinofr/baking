@@ -39,31 +39,26 @@ func CreateIngredient(c *fiber.Ctx) error {
 		})
 	}
 
-	if ingredient.Quantity < 0 {
+	if ingredient.Quantity <= 0 {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
-			"error": "Quantity cannot be negative",
+			"error": "Quantity has to be greater than zero",
 		})
 	}
 
-	if ingredient.Price < 0 {
+	if ingredient.Price <= 0 {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
-			"error": "Price cannot be negative",
+			"error": "Price has to be greater than zero",
 		})
 	}
 
 	if ingredient.Nutrition.Calories < 0 ||
 		ingredient.Nutrition.Protein < 0 ||
 		ingredient.Nutrition.Fat < 0 ||
-		ingredient.Nutrition.Carbs.NetCarbs < 0 ||
+		ingredient.Nutrition.Carbs.Fiber < 0 ||
+		ingredient.Nutrition.Carbs.Sugar < 0 ||
 		ingredient.Nutrition.Carbs.TotalCarbs < 0 {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
-			"error": "Nutritional values cannot be negative",
-		})
-	}
-
-	if ingredient.Nutrition.Carbs.TotalCarbs < ingredient.Nutrition.Carbs.NetCarbs {
-		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
-			"error": "Total carbs must be greater than or equal to net carbs",
+			"error": "Nutritional values have to be greater than zero",
 		})
 	}
 
@@ -107,24 +102,72 @@ func GetIngredients(c *fiber.Ctx) error {
 func UpdateIngredient(c *fiber.Ctx) error {
 	id := c.Params("id")
 	objectID, err := primitive.ObjectIDFromHex(id)
-
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid Ingredient ID format",
 		})
 	}
 
-	filter := bson.M{"_id": objectID}
-	update := bson.M{"$set":bson.M{"completed":true}}
-
-	_, err = collection.UpdateOne(context.Background(),filter,update)
-	if err != nil {
-		return err
+	ingredient := new(models.Ingredient)
+	if err := c.BodyParser(ingredient); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+			"details": err.Error(),
+		})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"success": true,
-	})
+	if ingredient.Name == "" {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"error": "Name is required",
+		})
+	}
+
+	if ingredient.Type == "" {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"error": "At least one ingredient type (dry or wet) must be specified",
+		})
+	}
+
+	if ingredient.Quantity <= 0 {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"error": "Quantity has to be greater than zero",
+		})
+	}
+
+	if ingredient.Price <= 0 {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"error": "Price has to be greater than zero",
+		})
+	}
+
+	if ingredient.Nutrition.Calories < 0 ||
+		ingredient.Nutrition.Protein < 0 ||
+		ingredient.Nutrition.Fat < 0 ||
+		ingredient.Nutrition.Carbs.Fiber < 0 ||
+		ingredient.Nutrition.Carbs.Sugar < 0 ||
+		ingredient.Nutrition.Carbs.TotalCarbs < 0 {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"error": "Nutritional values have to be greater than zero",
+		})
+	}
+
+	filter := bson.M{"_id": objectID}
+	update := bson.M{"$set": ingredient}
+
+	result, err := collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to update ingredient",
+		})
+	}
+
+	if result.MatchedCount == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Ingredient not found",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(ingredient)
 }
 
 func DeleteIngredient(c *fiber.Ctx) error {

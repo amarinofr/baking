@@ -7,19 +7,20 @@ type Ingredient struct {
 	Name     string  `json:"name"`
 	Unit     string  `json:"unit"`
 	Quantity int     `json:"quantity"`
-	Price    float64 `json:"price"`
+	Price    float32 `json:"price"`
 	Type     string  `json:"type"`
-	Nutrition Nutrition `json:"nutrition"`
+	Nutrition *Nutrition `json:"nutrition"`
 }
 
 type Nutrition struct {
 	Calories int `json:"calories"`
-	Protein  int `json:"protein"`
-	Fat      int `json:"fat"`
-	Carbs    Carbs `json:"carbs"`
+	Protein  float32 `json:"protein"`
+	Fat      float32 `json:"fat"`
+	Carbs    *Carbs `json:"carbs"`
 }
 
 type Carbs struct {
-	NetCarbs int `json:"netCarbs"`
-	TotalCarbs int `json:"totalCarbs"`
+	Fiber float32 `json:"fiber"`
+	Sugar float32 `json:"sugar"`
+	TotalCarbs float32 `json:"totalCarbs"`
 }

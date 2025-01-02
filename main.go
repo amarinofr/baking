@@ -48,17 +48,17 @@ func main() {
 
 	app.Get("/api/ingredients", handlers.GetIngredients)
 	app.Post("/api/ingredients", handlers.CreateIngredient)
-	app.Patch("/api/ingredients/:id", handlers.UpdateIngredient)
+	app.Put("/api/ingredients/:id", handlers.UpdateIngredient)
 	app.Delete("/api/ingredients/:id", handlers.DeleteIngredient)
 
 	app.Get("/api/recipes", handlers.GetRecipes)
 	app.Post("/api/recipes", handlers.CreateRecipe)
-	app.Patch("/api/recipes/:id", handlers.UpdateRecipe)
+	app.Put("/api/recipes/:id", handlers.UpdateRecipe)
 	app.Delete("/api/recipes/:id", handlers.DeleteRecipe)
 
 	app.Get("/api/mixes", handlers.GetMixes)
 	app.Post("/api/mixes", handlers.CreateMix)
-	app.Patch("/api/mixes/:id", handlers.UpdateMix)
+	app.Put("/api/mixes/:id", handlers.UpdateMix)
 	app.Delete("/api/mixes/:id", handlers.DeleteMix)
 
 	port := os.Getenv("PORT")
